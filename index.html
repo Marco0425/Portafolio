@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marco Alba | Full Stack Developer</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark:      '#1f1f20',
+            primary:   '#2b4c7e',
+            secondary: '#567ebb',
+            muted:     '#606d80',
+            light:     '#dce0e6',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+
+    #scroll-progress {
+      position: fixed; top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2b4c7e, #567ebb);
+      z-index: 9999; width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #dce0e6 0%, #567ebb 50%, #dce0e6 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    .timeline-item::before {
+      content: ''; position: absolute; left: -33px; top: 6px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #567ebb; border: 2px solid #1f1f20;
+      box-shadow: 0 0 0 3px #2b4c7e;
+    }
+
+    .bar { animation: growUp 1.2s ease forwards; transform-origin: bottom; }
+    @keyframes growUp { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1f1f20; }
+    ::-webkit-scrollbar-thumb { background: #2b4c7e; border-radius: 3px; }
+
+    /* Modal */
+    #modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal-box {
+      background: #242425;
+      border: 1px solid rgba(86,126,187,0.25);
+      border-radius: 1.25rem;
+      max-width: 680px; width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="bg-dark text-light font-sans antialiased">
+
+  <div id="scroll-progress"></div>
+
+  <!-- ============================================================ -->
+  <!-- NAV BAR                                                       -->
+  <!-- ============================================================ -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="#inicio" class="text-xl font-bold tracking-tight">
+        <span class="text-secondary">&lt;</span>
+        <span class="text-light">Marco</span>
+        <span class="text-secondary">/&gt;</span>
+      </a>
+      <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-muted">
+        <li><a href="#inicio"      class="hover:text-secondary transition-colors duration-200">Inicio</a></li>
+        <li><a href="#skills"      class="hover:text-secondary transition-colors duration-200">Skills</a></li>
+        <li><a href="#proyectos"   class="hover:text-secondary transition-colors duration-200">Proyectos</a></li>
+        <li><a href="#experiencia" class="hover:text-secondary transition-colors duration-200">Experiencia</a></li>
+        <li>
+          <a href="#contacto"
+             class="px-4 py-2 rounded-xl border border-secondary text-secondary hover:bg-secondary hover:text-dark transition-all duration-300 text-sm font-semibold">
+            Contacto
+          </a>
+        </li>
+      </ul>
+      <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-white/5 transition" aria-label="Abrir menú">
+        <span class="block w-5 h-0.5 bg-light transition-all duration-300" id="ham-1"></span>
+        <span class="block w-5 h-0.5 bg-light transition-all duration-300" id="ham-2"></span>
+        <span class="block w-5 h-0.5 bg-light transition-all duration-300" id="ham-3"></span>
+      </button>
+    </nav>
+    <div id="mobile-menu" class="md:hidden hidden flex-col gap-1 px-6 pb-4 bg-dark/95 backdrop-blur-md border-t border-white/5">
+      <a href="#inicio"      class="block py-3 text-muted hover:text-secondary transition-colors border-b border-white/5">Inicio</a>
+      <a href="#skills"      class="block py-3 text-muted hover:text-secondary transition-colors border-b border-white/5">Skills</a>
+      <a href="#proyectos"   class="block py-3 text-muted hover:text-secondary transition-colors border-b border-white/5">Proyectos</a>
+      <a href="#experiencia" class="block py-3 text-muted hover:text-secondary transition-colors border-b border-white/5">Experiencia</a>
+      <a href="#contacto"    class="block py-3 text-secondary font-semibold hover:text-light transition-colors">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============================================================ -->
+    <!-- HERO                                                          -->
+    <!-- ============================================================ -->
+    <section id="inicio" class="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-20 max-w-6xl mx-auto">
+      <div class="fade-in">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-xs font-semibold uppercase tracking-widest mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+          Disponible para trabajar
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight mb-4">
+          <span class="text-light">Marco Alba</span>
+        </h1>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-6">
+          <span class="gradient-text">Full Stack Developer</span>
+        </h2>
+
+        <p class="max-w-2xl text-muted text-base sm:text-lg leading-relaxed mb-4">
+          Más de <strong class="text-light font-semibold">4 años</strong> construyendo sistemas de alta complejidad
+          en los sectores <strong class="text-light font-semibold">financiero, seguros y telecomunicaciones</strong>.
+        </p>
+        <p class="max-w-2xl text-muted text-base sm:text-lg leading-relaxed mb-10">
+          Especializado en automatización de procesos, integración de sistemas legacy y APIs escalables
+          que traducen lógica de negocio compleja en soluciones robustas y mantenibles.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <a href="#proyectos"
+             class="px-6 py-3 rounded-xl bg-primary hover:bg-secondary text-light font-semibold transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-secondary/30">
+            Ver Proyectos
+          </a>
+          <a href="#contacto"
+             class="px-6 py-3 rounded-xl border border-muted/50 text-muted hover:border-secondary hover:text-secondary font-semibold transition-all duration-300">
+            Contacto
+          </a>
+        </div>
+      </div>
+
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted/50 text-xs animate-bounce">
+        <span>Scroll</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- TECH STACK / SKILLS                                           -->
+    <!-- ============================================================ -->
+    <section id="skills" class="py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+
+        <div class="fade-in mb-16 text-center">
+          <p class="text-secondary text-sm font-semibold uppercase tracking-widest mb-3">Tecnologías</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-light">Tech Stack</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- Backend -->
+          <div class="fade-in group p-6 rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300">
+            <div class="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center mb-5">
+              <svg class="w-5 h-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+              </svg>
+            </div>
+            <h3 class="text-light font-semibold mb-4">Backend</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Python</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Django / DRF</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Flask / FastAPI</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Odoo</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>REST APIs</li>
+            </ul>
+          </div>
+
+          <!-- Frontend -->
+          <div class="fade-in group p-6 rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300">
+            <div class="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center mb-5">
+              <svg class="w-5 h-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-light font-semibold mb-4">Frontend</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Vue 3 / Composition API</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>PrimeVue</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>JavaScript / TypeScript</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Tailwind CSS</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>React / ApexCharts</li>
+            </ul>
+          </div>
+
+          <!-- Databases -->
+          <div class="fade-in group p-6 rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300">
+            <div class="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center mb-5">
+              <svg class="w-5 h-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+            </div>
+            <h3 class="text-light font-semibold mb-4">Databases</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Oracle SQL</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>PostgreSQL</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>MySQL / SQL Server</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>MongoDB</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>SQLite</li>
+            </ul>
+          </div>
+
+          <!-- DevOps & Tools -->
+          <div class="fade-in group p-6 rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300">
+            <div class="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center mb-5">
+              <svg class="w-5 h-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-light font-semibold mb-4">DevOps & Tools</h3>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Git / GitHub Actions</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Git Flow</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Docker / AWS</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Linux / RedHat</li>
+              <li class="flex items-center gap-2 text-sm text-muted"><span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>Claude Code / AI Agents</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PROYECTOS                                                      -->
+    <!-- ============================================================ -->
+    <section id="proyectos" class="py-24 px-6 bg-white/[0.02]">
+      <div class="max-w-6xl mx-auto">
+
+        <div class="fade-in mb-16 text-center">
+          <p class="text-secondary text-sm font-semibold uppercase tracking-widest mb-3">Casos de Éxito</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-light">Proyectos Destacados</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+          <!-- ---- Atenea ---- -->
+          <div class="fade-in group flex flex-col rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/40 transition-all duration-300 overflow-hidden">
+            <!-- Mockup CSS: Dashboard de métricas de Atenea -->
+            <div class="relative h-60 bg-[#161617] p-5 overflow-hidden">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+                <span class="ml-3 text-[10px] text-muted/60 font-mono">atenea / métricas</span>
+              </div>
+              <!-- KPIs reales de Atenea -->
+              <div class="grid grid-cols-4 gap-1.5 mb-3">
+                <div class="rounded-lg bg-primary/20 p-2 border border-primary/20 text-center">
+                  <p class="text-[8px] text-muted uppercase tracking-wide leading-tight">Completado</p>
+                  <p class="text-base font-bold text-green-400">93.8%</p>
+                </div>
+                <div class="rounded-lg bg-primary/20 p-2 border border-primary/20 text-center">
+                  <p class="text-[8px] text-muted uppercase tracking-wide leading-tight">Retraso</p>
+                  <p class="text-base font-bold text-secondary">0%</p>
+                </div>
+                <div class="rounded-lg bg-primary/20 p-2 border border-primary/20 text-center">
+                  <p class="text-[8px] text-muted uppercase tracking-wide leading-tight">Hs. Est.</p>
+                  <p class="text-base font-bold text-light">1720h</p>
+                </div>
+                <div class="rounded-lg bg-primary/20 p-2 border border-primary/20 text-center">
+                  <p class="text-[8px] text-muted uppercase tracking-wide leading-tight">Extra</p>
+                  <p class="text-base font-bold text-light">0h</p>
+                </div>
+              </div>
+              <!-- Mini Kanban simulado -->
+              <div class="grid grid-cols-3 gap-1.5">
+                <div class="rounded-lg bg-white/5 p-2 border border-white/8">
+                  <div class="flex items-center gap-1 mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                    <span class="text-[9px] text-muted font-semibold">Pendiente</span>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="rounded bg-white/8 px-1.5 py-1">
+                      <div class="h-1.5 rounded bg-light/20 w-full mb-0.5"></div>
+                      <div class="text-[8px] text-muted/60">Herramientas · JK</div>
+                    </div>
+                    <div class="rounded bg-white/8 px-1.5 py-1">
+                      <div class="h-1.5 rounded bg-light/20 w-3/4 mb-0.5"></div>
+                      <div class="text-[8px] text-muted/60">Salesforce · IZ</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="rounded-lg bg-white/5 p-2 border border-white/8">
+                  <div class="flex items-center gap-1 mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                    <span class="text-[9px] text-muted font-semibold">En desarrollo</span>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="rounded bg-white/8 px-1.5 py-1">
+                      <div class="h-1.5 rounded bg-light/20 w-full mb-0.5"></div>
+                      <div class="text-[8px] text-muted/60">Contabilidad · LA</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="rounded-lg bg-white/5 p-2 border border-white/8">
+                  <div class="flex items-center gap-1 mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                    <span class="text-[9px] text-muted font-semibold">Hecho</span>
+                    <span class="ml-auto text-[9px] text-green-400 font-bold">38</span>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="rounded bg-green-500/10 border border-green-500/20 px-1.5 py-1">
+                      <div class="h-1.5 rounded bg-green-400/30 w-full mb-0.5"></div>
+                      <div class="text-[8px] text-green-400/70">Cierre Siniestro · Luis</div>
+                    </div>
+                    <div class="rounded bg-green-500/10 border border-green-500/20 px-1.5 py-1">
+                      <div class="h-1.5 rounded bg-green-400/30 w-3/4 mb-0.5"></div>
+                      <div class="text-[8px] text-green-400/70">Recas · Luis</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#161617] via-transparent to-transparent pointer-events-none opacity-60"></div>
+            </div>
+
+            <div class="flex flex-col flex-1 p-6">
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-xl font-bold text-light">Atenea</h3>
+                <span class="px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 text-[10px] font-semibold border border-green-400/20">En producción</span>
+              </div>
+              <p class="text-xs text-muted mb-3">Plataforma de planificación y seguimiento de proyectos de TI</p>
+              <p class="text-sm text-muted leading-relaxed mb-5">
+                Herramienta propia que el área de TI de <strong class="text-light">HIR Seguros</strong> usa en producción
+                desde hace más de 6 meses para reportes gerenciales. Reemplazó el seguimiento manual de estatus
+                previo a cada junta. Incluye Kanban de tareas, calendario, métricas en vivo
+                (93.8% completado, 0% retraso, 1,720h estimadas) e histórico de auditoría por tarea.
+              </p>
+              <div class="flex flex-wrap gap-2 mb-6">
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Django</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Vue.js</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">ApexCharts</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">PostgreSQL</span>
+              </div>
+              <div class="mt-auto">
+                <button onclick="openModal('atenea')" class="w-full py-2.5 rounded-xl border border-secondary/40 text-secondary text-sm font-semibold hover:bg-secondary hover:text-dark transition-all duration-300">
+                  Ver detalles →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- Dinner School ---- -->
+          <div class="fade-in group flex flex-col rounded-2xl border border-white/8 bg-white/3 hover:border-secondary/40 transition-all duration-300 overflow-hidden">
+            <!-- Mockup CSS: Kanban de cocina + estado de cuenta -->
+            <div class="relative h-60 bg-[#161617] p-5 overflow-hidden">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+                <span class="ml-3 text-[10px] text-muted/60 font-mono">dinner-school / cocina</span>
+              </div>
+              <!-- Contador de pedidos -->
+              <div class="grid grid-cols-3 gap-1.5 mb-3">
+                <div class="rounded-lg bg-yellow-400/10 border border-yellow-400/20 p-2 text-center">
+                  <p class="text-[8px] text-muted uppercase">Preparación</p>
+                  <p class="text-base font-bold text-yellow-400">12</p>
+                </div>
+                <div class="rounded-lg bg-blue-400/10 border border-blue-400/20 p-2 text-center">
+                  <p class="text-[8px] text-muted uppercase">Finalizado</p>
+                  <p class="text-base font-bold text-blue-400">34</p>
+                </div>
+                <div class="rounded-lg bg-green-400/10 border border-green-400/20 p-2 text-center">
+                  <p class="text-[8px] text-muted uppercase">Entregado</p>
+                  <p class="text-base font-bold text-green-400">847</p>
+                </div>
+              </div>
+              <!-- Tarjetas de pedidos simuladas -->
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 rounded-lg bg-yellow-400/5 border border-yellow-400/15 px-3 py-2">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <span class="text-[10px] text-light font-semibold">Karla C. — Secundaria 1°B</span>
+                      <span class="text-[9px] text-yellow-400 bg-yellow-400/10 px-1.5 rounded-full">Receso 1 · 4 platillos</span>
+                    </div>
+                    <div class="text-[9px] text-muted">Agua 600ml x2, Churritos x1, Chapata Bistec x1</div>
+                  </div>
+                  <span class="text-[10px] text-yellow-400 font-bold">$170</span>
+                </div>
+                <div class="flex items-start gap-2 rounded-lg bg-white/5 border border-white/8 px-3 py-2">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <span class="text-[10px] text-light font-semibold">Elizabeth E. — Secundaria 1°A</span>
+                      <span class="text-[9px] text-muted bg-white/8 px-1.5 rounded-full">Receso 1 · 2 platillos</span>
+                    </div>
+                    <div class="text-[9px] text-muted">Agua 1 litro x2</div>
+                  </div>
+                  <span class="text-[10px] text-light font-bold">$50</span>
+                </div>
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#161617] via-transparent to-transparent pointer-events-none opacity-60"></div>
+            </div>
+
+            <div class="flex flex-col flex-1 p-6">
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-xl font-bold text-light">Dinner School</h3>
+                <span class="px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 text-[10px] font-semibold border border-green-400/20">En producción</span>
+              </div>
+              <p class="text-xs text-muted mb-3">Sistema de gestión de cafetería escolar — CERTO Café</p>
+              <p class="text-sm text-muted leading-relaxed mb-5">
+                Reemplazó el sistema de pedidos por WhatsApp de una cafetería escolar con
+                <strong class="text-light">800–1,150 pedidos diarios</strong>, 360+ alumnos y 174+ tutores registrados.
+                11 módulos: crear pedidos, cocina Kanban (Preparación → Finalizado → Entregado),
+                créditos prepagados, estados de cuenta por familia e historial auditable.
+              </p>
+              <div class="flex flex-wrap gap-2 mb-6">
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Django</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">PostgreSQL</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Render</span>
+                <span class="px-2.5 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">JavaScript</span>
+              </div>
+              <div class="mt-auto">
+                <button onclick="openModal('dinner')" class="w-full py-2.5 rounded-xl border border-secondary/40 text-secondary text-sm font-semibold hover:bg-secondary hover:text-dark transition-all duration-300">
+                  Ver detalles →
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- EXPERIENCIA PROFESIONAL                                       -->
+    <!-- ============================================================ -->
+    <section id="experiencia" class="py-24 px-6">
+      <div class="max-w-3xl mx-auto">
+
+        <div class="fade-in mb-16 text-center">
+          <p class="text-secondary text-sm font-semibold uppercase tracking-widest mb-3">Trayectoria</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-light">Experiencia Profesional</h2>
+        </div>
+
+        <div class="relative border-l border-white/10 pl-8 space-y-12">
+
+          <!-- IDS Comercial / Banamex -->
+          <div class="fade-in relative timeline-item">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-light font-bold text-lg">Full Stack Developer</h3>
+              <span class="text-xs text-muted bg-white/5 px-3 py-1 rounded-full">Abr 2025 – Actual</span>
+            </div>
+            <p class="text-secondary text-sm font-medium mb-1">IDS Comercial <span class="text-muted font-normal">— Cliente: Banamex</span></p>
+            <p class="text-xs text-muted/60 mb-3">Ciudad de México · Híbrido · Vue 3 · PrimeVue · Django · DRF · Oracle SQL</p>
+            <ul class="space-y-2 text-sm text-muted">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Diseñé e implementé el módulo de capitalización del portal PTS con change-tracking por batch/grupo, deltas mes a mes e idempotencia basada en hash de archivo.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Desarrollé un sistema de true-up para reclasificación post-cierre con modelo append-only de deltas telescópicos e invariantes documentadas.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Implementé carga masiva vía Excel end-to-end: validación con Pandas/Openpyxl en Django/Oracle y frontend Vue con descarga blob Base64; resolví N+1 queries y excepciones silenciosas.
+              </li>
+            </ul>
+          </div>
+
+          <!-- HIR Seguros -->
+          <div class="fade-in relative timeline-item">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-light font-bold text-lg">Backend Developer</h3>
+              <span class="text-xs text-muted bg-white/5 px-3 py-1 rounded-full">Jul 2024 – Abr 2025</span>
+            </div>
+            <p class="text-secondary text-sm font-medium mb-1">HIR Seguros</p>
+            <p class="text-xs text-muted/60 mb-3">Ciudad de México · Python · Django · Vue.js · ApexCharts</p>
+            <ul class="space-y-2 text-sm text-muted">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Sistema de validación automatizada para siniestros de accidentes personales: facturas, montos, cartas pase y módulo de honorarios médicos, reduciendo tiempos de respuesta entre hospitales y analistas.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Optimicé migración de nuevas emisiones al sistema legacy, manejando carteras de <strong class="text-light">+100,000 asegurados</strong> con productos, coberturas, beneficiarios y recibos por agente.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Desarrollé <strong class="text-light">Atenea</strong>: herramienta interna de gestión de proyectos con Django y Vue.js + ApexCharts, adoptada como estándar de reporte gerencial del área de TI.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tline -->
+          <div class="fade-in relative timeline-item">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-light font-bold text-lg">Full Stack Developer</h3>
+              <span class="text-xs text-muted bg-white/5 px-3 py-1 rounded-full">Dic 2022 – Jul 2024</span>
+            </div>
+            <p class="text-secondary text-sm font-medium mb-1">Tline</p>
+            <p class="text-xs text-muted/60 mb-3">Ciudad de México · Odoo · Flask · AWS · CRM · B2B Logistics</p>
+            <ul class="space-y-2 text-sm text-muted">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Construí plataforma B2B en Flask entre <strong class="text-light">Telcel y Samsung</strong> para gestión logística de códigos de activación de dispositivos, con orquestador de peticiones y atención directa.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Desarrollé módulos Odoo personalizados para el panel de ventas y CRM inmobiliario en Florida con catálogo dinámico en AWS e integración con WhatsApp Business API.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Banamex Backend -->
+          <div class="fade-in relative timeline-item">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-light font-bold text-lg">Backend Developer</h3>
+              <span class="text-xs text-muted bg-white/5 px-3 py-1 rounded-full">May 2022 – Nov 2022</span>
+            </div>
+            <p class="text-secondary text-sm font-medium mb-1">Banamex</p>
+            <p class="text-xs text-muted/60 mb-3">Ciudad de México · Python · ABinitio · Microservices · RedHat</p>
+            <ul class="space-y-2 text-sm text-muted">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Migré procesos ABinitio a Python para microservicios de facturación con orquestador por eventos, lógica de particiones y 5 capas de validación (caracteres, registros, cuentas, fechas, cruce de BD).
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Alcancé <strong class="text-light">85% de cobertura de pruebas unitarias</strong> en RedHat y capacité al equipo interno y a un equipo externo completo en la nueva arquitectura.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Banamex BA -->
+          <div class="fade-in relative timeline-item">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-light font-bold text-lg">Junior Business Analyst</h3>
+              <span class="text-xs text-muted bg-white/5 px-3 py-1 rounded-full">Oct 2021 – May 2022</span>
+            </div>
+            <p class="text-secondary text-sm font-medium mb-1">Banamex</p>
+            <p class="text-xs text-muted/60 mb-3">Ciudad de México</p>
+            <ul class="space-y-2 text-sm text-muted">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary mt-1 flex-shrink-0">→</span>
+                Generé historias de usuario y Matrices Origen-Destino para procesos de cruce de información y facturación, actuando como puente entre negocio y desarrollo para corregir inconsistencias en modelado de datos.
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Educación -->
+        <div class="fade-in mt-16 pt-12 border-t border-white/8">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center flex-shrink-0 mt-1">
+              <svg class="w-5 h-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-secondary text-xs font-semibold uppercase tracking-widest mb-1">Educación</p>
+              <h4 class="text-light font-bold">Ingeniería en Computación <span class="text-muted font-normal">· Titulado</span></h4>
+              <p class="text-muted text-sm">Instituto Politécnico Nacional — ESIME Culhuacán</p>
+              <p class="text-muted/60 text-xs mt-0.5">Enero 2021 · Ciudad de México</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CONTACTO                                                       -->
+    <!-- ============================================================ -->
+    <section id="contacto" class="py-24 px-6 bg-white/[0.02]">
+      <div class="max-w-xl mx-auto">
+
+        <div class="fade-in mb-12 text-center">
+          <p class="text-secondary text-sm font-semibold uppercase tracking-widest mb-3">Hablemos</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-light mb-4">Contacto</h2>
+          <p class="text-muted text-sm leading-relaxed">
+            ¿Tienes un proyecto o una oportunidad? Escríbeme y exploramos cómo puedo aportar.
+          </p>
+          <a href="mailto:tony980425@gmail.com"
+             class="inline-flex items-center gap-2 mt-4 text-secondary text-sm hover:text-light transition-colors">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            tony980425@gmail.com
+          </a>
+        </div>
+
+        <form class="fade-in space-y-5" onsubmit="return false;">
+          <div>
+            <label for="nombre" class="block text-sm text-muted font-medium mb-2">Nombre</label>
+            <input id="nombre" type="text" placeholder="Tu nombre completo"
+              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-light placeholder-muted/50 text-sm focus:outline-none focus:border-secondary transition-colors duration-200" />
+          </div>
+          <div>
+            <label for="email" class="block text-sm text-muted font-medium mb-2">Email</label>
+            <input id="email" type="email" placeholder="tu@email.com"
+              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-light placeholder-muted/50 text-sm focus:outline-none focus:border-secondary transition-colors duration-200" />
+          </div>
+          <div>
+            <label for="mensaje" class="block text-sm text-muted font-medium mb-2">Mensaje</label>
+            <textarea id="mensaje" rows="5" placeholder="Cuéntame sobre tu proyecto u oportunidad..."
+              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-light placeholder-muted/50 text-sm focus:outline-none focus:border-secondary transition-colors duration-200 resize-none"></textarea>
+          </div>
+          <button type="submit"
+            class="w-full py-3 rounded-xl bg-primary hover:bg-secondary text-light font-semibold text-sm transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-secondary/30">
+            Enviar mensaje →
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER                                                        -->
+  <!-- ============================================================ -->
+  <footer class="border-t border-white/5 py-10 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <a href="#inicio" class="text-base font-bold">
+        <span class="text-secondary">&lt;</span>
+        <span class="text-light">Marco Alba</span>
+        <span class="text-secondary">/&gt;</span>
+      </a>
+      <ul class="flex gap-6 text-sm text-muted">
+        <li><a href="#skills"      class="hover:text-secondary transition-colors">Skills</a></li>
+        <li><a href="#proyectos"   class="hover:text-secondary transition-colors">Proyectos</a></li>
+        <li><a href="#experiencia" class="hover:text-secondary transition-colors">Experiencia</a></li>
+        <li><a href="#contacto"    class="hover:text-secondary transition-colors">Contacto</a></li>
+      </ul>
+      <div class="flex items-center gap-4">
+        <!-- GitHub -->
+        <a href="https://github.com/Marco0425" target="_blank" rel="noopener" aria-label="GitHub"
+           class="w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-muted hover:text-secondary hover:border-secondary transition-all duration-300">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+        <!-- LinkedIn -->
+        <a href="https://www.linkedin.com/in/marco-antonio-alba-osorio-962063207" target="_blank" rel="noopener" aria-label="LinkedIn"
+           class="w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-muted hover:text-secondary hover:border-secondary transition-all duration-300">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <p class="text-center text-xs text-muted/40 mt-8">
+      &copy; 2026 Marco Antonio Alba Osorio · Tlalpan, Ciudad de México
+    </p>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- MODALES DE PROYECTOS                                          -->
+  <!-- ============================================================ -->
+  <div id="modal-overlay" role="dialog" aria-modal="true">
+    <div id="modal-box">
+
+      <!-- Contenido: Atenea -->
+      <div id="modal-atenea" class="hidden">
+        <!-- Header -->
+        <div class="flex items-start justify-between p-6 border-b border-white/8">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-xl font-bold text-light">Atenea</h3>
+              <span class="px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 text-[10px] font-semibold border border-green-400/20">En producción</span>
+            </div>
+            <p class="text-sm text-muted">Plataforma de planificación y seguimiento de proyectos de TI</p>
+          </div>
+          <button id="close-modal" class="text-muted hover:text-light transition-colors p-1 rounded-lg hover:bg-white/5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-6">
+
+          <!-- Contexto -->
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">El problema</h4>
+            <p class="text-sm text-muted leading-relaxed">
+              El área de TI de <strong class="text-light">HIR Seguros</strong> llegaba a cada junta gerencial
+              sin una fuente única de verdad: el avance de proyectos se armaba manualmente, no había forma de
+              ver atrasos de un vistazo y no existía bitácora de cambios por tarea.
+            </p>
+          </div>
+
+          <!-- Solución / módulos -->
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">La solución — 5 módulos</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Kanban de Tareas</p>
+                  <p class="text-xs text-muted mt-0.5">Pendiente → En desarrollo → Pruebas → Hecho. Filtros por proyecto, miembro y fechas.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Proyectos</p>
+                  <p class="text-xs text-muted mt-0.5">Tarjetas con progreso en vivo, horas extra y separación Activos / Finalizados.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Calendario</p>
+                  <p class="text-xs text-muted mt-0.5">Vista mensual de tareas por fecha, codificadas por color.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Métricas gerenciales</p>
+                  <p class="text-xs text-muted mt-0.5">% completado, tasa de retraso, horas estimadas vs. reales por miembro. Filtrables.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8 sm:col-span-2">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Histórico de auditoría</p>
+                  <p class="text-xs text-muted mt-0.5">Cada cambio de estado queda registrado con marca de tiempo (pendiente → desarrollo → pruebas → hecho).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPIs reales -->
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">KPIs reales en producción</h4>
+            <div class="grid grid-cols-4 gap-2">
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-green-400">93.8%</p>
+                <p class="text-[10px] text-muted mt-0.5">Completado</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-secondary">0%</p>
+                <p class="text-[10px] text-muted mt-0.5">Retraso</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-light">1720h</p>
+                <p class="text-[10px] text-muted mt-0.5">Estimadas</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-light">6+</p>
+                <p class="text-[10px] text-muted mt-0.5">Meses activo</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stack -->
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">Stack</h4>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Django</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Vue.js</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">ApexCharts</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">PostgreSQL</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Python</span>
+            </div>
+          </div>
+
+          <!-- Botón descarga -->
+          <a href="proyectos/Atenea_Documentacion_Funcional.pdf" download
+             class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary hover:bg-secondary text-light font-semibold text-sm transition-all duration-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Descargar documentación completa (PDF)
+          </a>
+        </div>
+      </div>
+
+      <!-- Contenido: Dinner School -->
+      <div id="modal-dinner" class="hidden">
+        <div class="flex items-start justify-between p-6 border-b border-white/8">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-xl font-bold text-light">Dinner School</h3>
+              <span class="px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 text-[10px] font-semibold border border-green-400/20">En producción</span>
+            </div>
+            <p class="text-sm text-muted">Sistema de gestión de cafetería escolar — CERTO Café</p>
+          </div>
+          <button id="close-modal-2" class="text-muted hover:text-light transition-colors p-1 rounded-lg hover:bg-white/5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-6">
+
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">El problema</h4>
+            <p class="text-sm text-muted leading-relaxed">
+              La cafetería recibía <strong class="text-light">800–1,150 pedidos diarios</strong> de 360 alumnos
+              y sus tutores por WhatsApp, de forma manual. Órdenes que se perdían, sin visibilidad de saldos,
+              sin trazabilidad de entregas y sin forma de saber quién había comido o pagado.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">La solución — 11 módulos</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Crear pedido</p>
+                  <p class="text-xs text-muted mt-0.5">Platillo, cantidad, turno (Receso 1/2), alumno y tutor — reemplaza el mensaje de WhatsApp.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Cocina Kanban</p>
+                  <p class="text-xs text-muted mt-0.5">Preparación → Finalizado → Entregado. Cada tarjeta muestra alumno, grado, platillos y total.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Créditos</p>
+                  <p class="text-xs text-muted mt-0.5">Saldo prepagado por familia. Límites de deuda controlados: tutores hasta -$250, profesores hasta -$1,000.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Estados de cuenta</p>
+                  <p class="text-xs text-muted mt-0.5">Detalle de movimientos por tutor: créditos asignados, pedidos y saldo corrido.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Catálogo (Platillos + Ingredientes)</p>
+                  <p class="text-xs text-muted mt-0.5">Ingredientes base asociados a cada platillo. Al elegir el platillo el sistema ya sabe con qué se prepara.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-white/4 border border-white/8">
+                <span class="text-secondary mt-0.5">■</span>
+                <div>
+                  <p class="text-sm text-light font-medium">Anuncios</p>
+                  <p class="text-xs text-muted mt-0.5">Comunicados para familias (menú semanal, promociones, avisos) — reemplaza el grupo de WhatsApp.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Escala -->
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">Escala en producción</h4>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-secondary">1,150</p>
+                <p class="text-[10px] text-muted mt-0.5">Pedidos/día (pico)</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-light">360+</p>
+                <p class="text-[10px] text-muted mt-0.5">Alumnos</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-primary/15 border border-primary/20">
+                <p class="text-lg font-bold text-light">174+</p>
+                <p class="text-[10px] text-muted mt-0.5">Tutores registrados</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-secondary text-xs font-semibold uppercase tracking-widest mb-3">Stack</h4>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Django</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">PostgreSQL</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Render</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">JavaScript</span>
+              <span class="px-3 py-1 rounded-lg bg-primary/20 text-secondary text-xs font-medium border border-primary/30">Python</span>
+            </div>
+          </div>
+
+          <a href="proyectos/Dinner_School_Documentacion_Funcional.pdf" download
+             class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary hover:bg-secondary text-light font-semibold text-sm transition-all duration-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Descargar documentación completa (PDF)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT                                                    -->
+  <!-- ============================================================ -->
+  <script>
+    // Menú móvil
+    const menuBtn    = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const ham1 = document.getElementById('ham-1');
+    const ham2 = document.getElementById('ham-2');
+    const ham3 = document.getElementById('ham-3');
+    let menuOpen = false;
+
+    menuBtn.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('hidden', !menuOpen);
+      mobileMenu.classList.toggle('flex', menuOpen);
+      if (menuOpen) {
+        ham1.style.transform = 'translateY(8px) rotate(45deg)';
+        ham2.style.opacity   = '0';
+        ham3.style.transform = 'translateY(-8px) rotate(-45deg)';
+      } else {
+        ham1.style.transform = '';
+        ham2.style.opacity   = '1';
+        ham3.style.transform = '';
+      }
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menuOpen = false;
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('flex');
+        ham1.style.transform = '';
+        ham2.style.opacity   = '1';
+        ham3.style.transform = '';
+      });
+    });
+
+    // Navbar con fondo al scrollear
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'border-b', 'border-white/5', 'shadow-lg');
+      } else {
+        navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'border-b', 'border-white/5', 'shadow-lg');
+      }
+    });
+
+    // Barra de progreso de scroll
+    const scrollProgress = document.getElementById('scroll-progress');
+    window.addEventListener('scroll', () => {
+      const scrollTop    = document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      scrollProgress.style.width = (scrollTop / scrollHeight * 100) + '%';
+    });
+
+    // Fade-in al hacer scroll
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    fadeEls.forEach(el => observer.observe(el));
+
+    // Modal de proyectos
+    const overlay     = document.getElementById('modal-overlay');
+    const modalAtenea = document.getElementById('modal-atenea');
+    const modalDinner = document.getElementById('modal-dinner');
+
+    function openModal(project) {
+      modalAtenea.classList.add('hidden');
+      modalDinner.classList.add('hidden');
+      if (project === 'atenea') modalAtenea.classList.remove('hidden');
+      if (project === 'dinner') modalDinner.classList.remove('hidden');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+    document.getElementById('close-modal-2').addEventListener('click', closeModal);
+
+    // Cerrar al hacer clic fuera del modal
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+
+</body>
+</html>
